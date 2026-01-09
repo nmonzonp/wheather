@@ -1,82 +1,95 @@
 # NicolasCast Weather App
-iOS weather application built with SwiftUI that brings weather data to life with stunning animations and an intuitive interface.
+
+A weather app for iOS that shows real-time weather with smooth animations and a clean interface.
 
 **Author:** Nicolas Monzon  
 **Created:** January 8, 2026
 
-## What This App Does
+## What It Does
 
-NicolasCast is a weather app that goes beyond just showing temperatures. It features:
+This app pulls weather data from OpenWeatherMap and displays it with some nice visual touches:
 
-- **Real-time weather data** from OpenWeatherMap API
-- **Beautiful animated backgrounds** that change based on weather conditions and time of day
-- **Smooth animations** including breathing aurora effects, animated weather icons, and rolling temperature counters
-- **Multiple location support** - check weather for your current location or predefined cities (London, Montevideo, Buenos Aires)
-- **Smart caching** with automatic refresh when data becomes stale
-- **Accessibility support** throughout the app
+- Real-time weather for your current location or preset cities (London, Montevideo, Buenos Aires)
+- Animated backgrounds that change based on weather and time of day
+- Smooth animations for weather icons and temperature changes
+- Caches data so you're not hammering the API
+- Works with VoiceOver and other accessibility features
 
-## Architecture & Design
+## Getting Started
 
-This app follows modern iOS development best practices:
+### 1. Get an API Key
 
-### MVVM Architecture
-- **ViewModels** handle business logic and state management
-- **Views** are purely declarative SwiftUI components
-- **Models** represent domain data with proper separation from API responses
-- **Services** handle external dependencies (networking, location, persistence)
+You need an OpenWeatherMap API key to run this app:
 
-### Key Components
+1. Go to [https://openweathermap.org/api](https://openweathermap.org/api)
+2. Sign up for a free account
+3. Grab your API key from your account dashboard
 
-#### Networking Layer (`Networking/`)
-- **APIClient**: Generic, protocol-based HTTP client with automatic retry logic
-- **WeatherEndpoint**: Type-safe API endpoint definitions
-- **NetworkError**: User-friendly error handling with localized messages
-- Supports linear backoff retry (1s, 3s) for transient network failures
+### 2. Add Your API Key
 
-#### Services (`Services/`)
-- **WeatherService**: Fetches weather data for coordinates or cities
-- **LocationManager**: Manages device location with proper permission handling
-- **PersistenceManager**: Lightweight UserDefaults wrapper for user preferences
+1. Copy `NicolasCast/Configuration/Secrets.dist.xcconfig` to `Secrets.xcconfig` in the same folder
+2. Open `Secrets.xcconfig` and replace `YOUR_KEY_HERE` with your actual API key:
+   ```
+   OPENWEATHER_API_KEY = your_actual_key_here
+   ```
 
-#### Views (`Views/`)
-The UI is organized into reusable components:
-- **Screens**: Main container views (MainView, PagedWeatherView)
-- **Components**: Reusable UI elements (WeatherCardView, ErrorView, LoadingView)
-- **Animations**: Custom animated components (AnimatedBackground, AnimatedWeatherIcon, AnimatableNumberModifier)
+### 3. Run the App
 
-### Design Highlights
+1. Open `NicolasCast.xcodeproj` in Xcode
+2. Pick a simulator or device
+3. Hit Run (⌘R)
 
-**Dynamic Backgrounds**: The app features a "breathing" aurora effect that adapts to:
-- Current weather conditions (clear, rain, snow, clouds, etc.)
-- Time of day (day/night color schemes)
-- Smooth transitions between states
+**Requirements:**
+- iOS 17.0+
+- Xcode 15.0+
+- Swift 5.9+
 
-**Animated Weather Icons**: SF Symbols with condition-specific animations:
-- Sun pulses and rotates
-- Clouds drift slowly
-- Rain bounces
-- Thunder flashes
-- Snow gently spins
+## How It's Built
 
-**Rolling Temperature Counter**: Temperatures animate smoothly using `AnimatableModifier` for a polished feel.
+### Architecture
 
-## Technical Implementation
+The app uses MVVM:
+- **ViewModels** handle the logic and state
+- **Views** are SwiftUI components
+- **Models** represent the data
+- **Services** talk to external stuff (API, location, storage)
 
-### Dependencies
-- **SwiftUI** for declarative UI
-- **Combine** for reactive programming
-- **CoreLocation** for device location
-- **Foundation** for networking and data handling
+### Project Structure
 
-### API Integration
-Uses OpenWeatherMap API with:
-- Current weather data endpoint
-- Metric units (Celsius)
-- Proper error handling and retry logic
-- Response caching to minimize API calls
+```
+NicolasCast/
+├── App/                    # App entry point
+├── Configuration/          # API keys and config
+├── Models/
+│   ├── API/               # API response models
+│   └── Domain/            # App data models
+├── Networking/            # HTTP client
+├── Services/              # Weather, location, persistence
+├── ViewModels/            # MVVM ViewModels
+├── Views/
+│   ├── Screens/          # Main views
+│   ├── Components/       # Reusable UI bits
+│   └── Animations/       # Custom animations
+└── Utils/                # Helpers and extensions
 
-### State Management
-The app uses a clean state enum pattern:
+NicolasCastTests/         # Unit tests with mocks
+NicolasCastUITests/       # UI tests
+```
+
+### Key Features
+
+**Networking**
+- Generic HTTP client with retry logic (tries 3 times with backoff)
+- Type-safe API endpoints
+- Friendly error messages
+
+**Animations**
+- "Breathing" aurora background that changes with weather and time
+- Animated weather icons (sun pulses, clouds drift, rain bounces, etc.)
+- Rolling temperature counter
+
+**State Management**
+Clean state enum pattern:
 ```swift
 enum WeatherViewState {
     case idle
@@ -86,92 +99,26 @@ enum WeatherViewState {
 }
 ```
 
-### Testing
-Includes comprehensive unit tests with:
-- Mock implementations for all external dependencies
-- Tests for ViewModels, state transitions, and persistence
-- Proper async/await test patterns with `@MainActor`
+**Data Handling**
+- Caches weather data to reduce API calls
+- Auto-refreshes stale data
+- Refreshes when you come back to the app
 
-## Project Structure
+## Testing
 
-```
-NicolasCast/
-├── App/                    # App entry point
-├── Configuration/          # API keys and config
-├── Models/
-│   ├── API/               # API response models
-│   └── Domain/            # Domain models (WeatherData)
-├── Networking/            # HTTP client and endpoints
-├── Services/              # Business logic services
-├── ViewModels/            # MVVM ViewModels
-├── Views/
-│   ├── Screens/          # Full-screen views
-│   ├── Components/       # Reusable UI components
-│   └── Animations/       # Custom animations
-└── Utils/                # Extensions and helpers
+The app has unit tests for ViewModels and services. All external dependencies use mocks so tests run fast and don't need network access.
 
-NicolasCastTests/
-├── Mocks/                # Test doubles
-└── WeatherViewModelTests.swift
+Run tests with ⌘U in Xcode.
 
-NicolasCastUITests/       # UI automation tests
-```
+## What's Next
 
-## Setup & Configuration
-
-1. **API Key**: Add your OpenWeatherMap API key to `Configuration/APIConfiguration.swift`
-2. **Build**: Open `NicolasCast.xcodeproj` in Xcode
-3. **Run**: Select a simulator or device and hit Run (⌘R)
-
-### Requirements
-- iOS 17.0+
-- Xcode 15.0+
-- Swift 5.9+
-
-## Features in Detail
-
-### Location Support
-- Automatic current location detection (with permission)
-- Fallback to predefined cities if location is denied
-- Remembers last selected location across app launches
-
-### Data Freshness
-- Weather data is cached to reduce API calls
-- Automatically refreshes stale data (configurable interval)
-- Refreshes when app returns to foreground
-
-### Error Handling
-- User-friendly error messages
-- Specific handling for network issues, location errors, and API failures
-- Retry functionality built into the UI
-
-### Accessibility
-- VoiceOver support throughout
-- Semantic labels for all interactive elements
-- Proper accessibility hints and traits
-
-## Code Quality
-
-This project emphasizes:
-- **Dependency Injection** for testability
-- **Protocol-based design** for flexibility
-- **Async/await** for modern concurrency
-- **Type safety** with Swift's strong typing
-- **Clean separation of concerns**
-- **Comprehensive error handling**
-
-No AI-generated code slop - just clean, maintainable Swift code written by a human developer.
-
-## Future Enhancements
-
-Potential improvements:
+Some ideas for future updates:
 - Hourly and weekly forecasts
-- Weather alerts and notifications
-- More cities and search functionality
-- Weather widgets
-- Dark mode refinements
-- Additional weather data (UV index, air quality, etc.)
+- Weather alerts
+- Search for any city
+- Home screen widgets
+- More weather details (UV index, air quality)
 
 ---
 
-Built  by Nicolas Monzon
+Built by Nicolas Monzon
