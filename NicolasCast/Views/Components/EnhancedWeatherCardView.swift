@@ -152,14 +152,14 @@ struct EnhancedLoadingView: View {
                 // Outer pulse ring
                 Circle()
                     .stroke(Color.white.opacity(0.2), lineWidth: 2)
-                    .frame(width: 140, height: 140)
+                    .frame(width: 160, height: 160)
                     .scaleEffect(isPulsing ? 1.3 : 0.9)
                     .opacity(isPulsing ? 0 : 0.6)
                 
                 // Inner pulse ring
                 Circle()
                     .stroke(Color.white.opacity(0.3), lineWidth: 2)
-                    .frame(width: 100, height: 100)
+                    .frame(width: 120, height: 120)
                     .scaleEffect(isPulsing ? 1.2 : 0.95)
                     .opacity(isPulsing ? 0.3 : 0.8)
                 
@@ -168,6 +168,7 @@ struct EnhancedLoadingView: View {
                     .font(.system(size: 60, weight: .medium))
                     .symbolRenderingMode(.hierarchical)
                     .foregroundStyle(.white)
+                    
             }
             
             VStack(spacing: 12) {

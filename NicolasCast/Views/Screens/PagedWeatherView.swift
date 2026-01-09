@@ -91,8 +91,10 @@ struct WeatherPageView: View {
         VStack {
             Spacer()
             
-            contentView
-                .transition(.opacity.combined(with: .scale(scale: 0.95)))
+            ZStack {
+                contentView
+            }
+            .animation(.spring(response: 0.6, dampingFraction: 0.8), value: viewModel.viewState)
             
             Spacer()
             
@@ -107,13 +109,22 @@ struct WeatherPageView: View {
         if location == viewModel.selectedLocation {
             switch viewModel.viewState {
             case .idle:
-                EmptyView()
+                Color.clear
                 
             case .loading:
                 EnhancedLoadingView()
+                    .transition(.opacity.animation(.easeInOut(duration: 0.2)))
+                    .zIndex(1)
                 
             case .loaded(let data):
                 EnhancedWeatherCardView(weatherData: data)
+                    .transition(
+                        .asymmetric(
+                            insertion: .opacity.combined(with: .scale(scale: 0.95)).combined(with: .move(edge: .bottom)).combined(with: .offset(y: 20)),
+                            removal: .opacity.combined(with: .scale(scale: 1.05))
+                        )
+                    )
+                    .zIndex(2)
                 
             case .error(let message):
                 ErrorView(
@@ -123,6 +134,7 @@ struct WeatherPageView: View {
                         ? { viewModel.requestLocationPermission() }
                         : nil
                 )
+                .transition(.opacity)
             }
         } else {
             Color.clear

@@ -14,6 +14,9 @@ import Combine
 final class WeatherViewModel: ObservableObject {
     
     @Published private(set) var viewState: WeatherViewState = .idle
+    
+    private var weatherCache: [LocationIdentifier: WeatherData] = [:]
+    
     @Published var selectedLocation: LocationIdentifier = .currentLocation {
         didSet {
             guard selectedLocation != oldValue else { return }
@@ -52,6 +55,19 @@ final class WeatherViewModel: ObservableObject {
     
     func fetchWeather() {
         currentTask?.cancel()
+        
+        if let cachedData = weatherCache[selectedLocation], !cachedData.isStale {
+            withAnimation(.spring(response: 0.6, dampingFraction: 0.8)) {
+                viewState = .loaded(cachedData)
+            }
+            return
+        }
+        
+        if weatherCache[selectedLocation] == nil {
+            withAnimation(.easeInOut(duration: 0.3)) {
+                viewState = .loading
+            }
+        }
         
         currentTask = Task {
             await performFetch()
@@ -118,8 +134,6 @@ final class WeatherViewModel: ObservableObject {
     private func performFetch() async {
         guard !Task.isCancelled else { return }
         
-        viewState = .loading
-        
         do {
             let weatherData: WeatherData
             
@@ -129,7 +143,9 @@ final class WeatherViewModel: ObservableObject {
                         locationManager.requestAuthorization()
                         return
                     } else {
-                        viewState = .error("Location access required. Please enable in Settings.")
+                        withAnimation {
+                            viewState = .error("Location access required. Please enable in Settings.")
+                        }
                         return
                     }
                 }
@@ -141,42 +157,65 @@ final class WeatherViewModel: ObservableObject {
                         latitude: location.coordinate.latitude,
                         longitude: location.coordinate.longitude
                     )
-                    
-                    guard !Task.isCancelled else { return }
-                    viewState = .loaded(weatherData)
                 } else {
                     return
                 }
             } else if let city = selectedLocation.targetCity {
                 weatherData = try await weatherService.fetchWeather(for: city)
-                
-                guard !Task.isCancelled else { return }
-                viewState = .loaded(weatherData)
             } else {
-                viewState = .error("Unknown location selected.")
+                withAnimation {
+                    viewState = .error("Unknown location selected.")
+                }
+                return
             }
+            
+            guard !Task.isCancelled else { return }
+            
+            weatherCache[selectedLocation] = weatherData
+            
+            withAnimation(.spring(response: 0.6, dampingFraction: 0.8)) {
+                viewState = .loaded(weatherData)
+            }
+            
         } catch let error as NetworkError {
             guard !Task.isCancelled else { return }
-            viewState = .error(error.localizedDescription)
+            withAnimation {
+                viewState = .error(error.localizedDescription)
+            }
         } catch {
             guard !Task.isCancelled else { return }
-            viewState = .error("An unexpected error occurred. Please try again.")
+            withAnimation {
+                viewState = .error("An unexpected error occurred. Please try again.")
+            }
         }
     }
     
     private func fetchWeatherForCoordinates(latitude: Double, longitude: Double) async {
-        viewState = .loading
+        if weatherCache[selectedLocation] == nil {
+            withAnimation {
+                viewState = .loading
+            }
+        }
         
         do {
             let weatherData = try await weatherService.fetchWeather(
                 latitude: latitude,
                 longitude: longitude
             )
-            viewState = .loaded(weatherData)
+            
+            weatherCache[selectedLocation] = weatherData
+            
+            withAnimation(.spring(response: 0.6, dampingFraction: 0.8)) {
+                viewState = .loaded(weatherData)
+            }
         } catch let error as NetworkError {
-            viewState = .error(error.localizedDescription)
+            withAnimation {
+                viewState = .error(error.localizedDescription)
+            }
         } catch {
-            viewState = .error("An unexpected error occurred. Please try again.")
+            withAnimation {
+                viewState = .error("An unexpected error occurred. Please try again.")
+            }
         }
     }
 }
