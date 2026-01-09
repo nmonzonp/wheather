@@ -110,15 +110,6 @@ The app has unit tests for ViewModels and services. All external dependencies us
 
 Run tests with ⌘U in Xcode.
 
-## What's Next
-
-Some ideas for future updates:
-- Hourly and weekly forecasts
-- Weather alerts
-- Search for any city
-- Home screen widgets
-- More weather details (UV index, air quality)
-
 ---
 
 Built by Nicolas Monzon

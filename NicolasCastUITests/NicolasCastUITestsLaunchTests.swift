@@ -2,7 +2,7 @@
 //  NicolasCastUITestsLaunchTests.swift
 //  NicolasCastUITests
 //
-//  Created by Albert Lukmanov on 08/01/2026.
+//  Created by Nicolas Monzon on 08/01/2026.
 //
 
 import XCTest
