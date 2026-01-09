@@ -40,7 +40,7 @@ You need an OpenWeatherMap API key to run this app:
 3. Hit Run (⌘R)
 
 **Requirements:**
-- iOS 17.0+
+- iOS 15.0+
 - Xcode 15.0+
 - Swift 5.9+
 
