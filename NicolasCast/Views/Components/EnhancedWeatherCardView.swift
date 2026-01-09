@@ -168,17 +168,12 @@ struct EnhancedLoadingView: View {
                     .font(.system(size: 60, weight: .medium))
                     .symbolRenderingMode(.hierarchical)
                     .foregroundStyle(.white)
-                    .rotationEffect(.degrees(rotation))
             }
             
             VStack(spacing: 12) {
                 Text("Loading Weather")
                     .font(.system(size: 22, weight: .semibold, design: .rounded))
                     .foregroundColor(.white)
-                
-                ProgressView()
-                    .progressViewStyle(CircularProgressViewStyle(tint: .white))
-                    .scaleEffect(1.3)
             }
         }
         .padding(.vertical, 48)

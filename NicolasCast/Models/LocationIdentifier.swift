@@ -8,10 +8,7 @@
 
 import Foundation
 
-// MARK: - Location Identifier
 
-/// Represents a selectable location in the weather app.
-/// Supports current device location and fixed cities.
 enum LocationIdentifier: String, CaseIterable, Identifiable {
     case currentLocation = "current"
     case london = "london"
@@ -20,7 +17,6 @@ enum LocationIdentifier: String, CaseIterable, Identifiable {
     
     var id: String { rawValue }
     
-    /// Human-readable display name
     var displayName: String {
         switch self {
         case .currentLocation:
@@ -34,7 +30,6 @@ enum LocationIdentifier: String, CaseIterable, Identifiable {
         }
     }
     
-    /// Maps to the target city enum for API calls (nil for current location)
     var targetCity: TargetCity? {
         switch self {
         case .currentLocation:
@@ -48,7 +43,6 @@ enum LocationIdentifier: String, CaseIterable, Identifiable {
         }
     }
     
-    /// Icon for the location picker
     var icon: String {
         switch self {
         case .currentLocation:
@@ -58,7 +52,6 @@ enum LocationIdentifier: String, CaseIterable, Identifiable {
         }
     }
     
-    /// Flag emoji for visual enhancement
     var flag: String {
         switch self {
         case .currentLocation:
@@ -72,12 +65,9 @@ enum LocationIdentifier: String, CaseIterable, Identifiable {
         }
     }
     
-    /// Creates a LocationIdentifier from a persisted string value.
-    /// Returns nil if the string is invalid or nil.
     init?(persistedValue: String?) {
         guard let value = persistedValue else { return nil }
         self.init(rawValue: value)
     }
 }
 
-// Note: TargetCity enum is defined in Networking/WeatherEndpoint.swift

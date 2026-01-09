@@ -83,6 +83,10 @@ extension LocationManager: CLLocationManagerDelegate {
         Task { @MainActor in
             self.authorizationStatus = manager.authorizationStatus
             self.onAuthorizationChange?(manager.authorizationStatus)
+            
+            if self.authorizationStatus == .authorizedWhenInUse || self.authorizationStatus == .authorizedAlways {
+                self.requestLocation()
+            }
         }
     }
 }
